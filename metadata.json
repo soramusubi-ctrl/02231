@@ -1,0 +1,7 @@
+{
+  "name": "おつかれさまです...ごはん、手伝いますね！",
+  "description": "Register your common vegetables, select what you have, and get instant recipes with AI-generated illustrations and protein variations.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
