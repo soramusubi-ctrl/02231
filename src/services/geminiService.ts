@@ -169,19 +169,32 @@ export const generateRecipeText = async (
 // -------------------------------------------------------
 export const generateRecipeImage = async (recipe: Recipe): Promise<string> => {
   try {
-    const prompt = `
-      Professional food photography of ${recipe.title}.
-      ${recipe.visualDescription}.
-      High resolution, appetizing, soft lighting, 4k, photorealistic, top-down view or 45-degree angle.
-      Style: Modern cookbook.
-    `;
+    // 料理名・視覚描写を明示した構造化プロンプト
+    // TEXT+IMAGE両方を指定することでモデルがプロンプトを正しく解釈する
+    const prompt = [
+      `Generate a single professional food photograph of the following Japanese dish:`,
+      `Dish name: "${recipe.title}"`,
+      `Visual description: ${recipe.visualDescription}`,
+      ``,
+      `Requirements:`,
+      `- The image MUST show the specific dish described above, plated and ready to eat.`,
+      `- DO NOT generate landscapes, scenery, or unrelated images.`,
+      `- Style: overhead or 45-degree angle shot, soft natural lighting, shallow depth of field.`,
+      `- Background: clean wooden table or neutral linen cloth.`,
+      `- The food should look appetizing, fresh, and home-cooked.`,
+      `- Aspect ratio: 4:3, resolution: 1K.`,
+    ].join('\n');
 
     const response: GenerateContentResponse = await ai.models.generateContent({
       model: IMAGE_MODEL,
       contents: prompt,
       config: {
-        // gemini-3.1-flash-image-preview は responseModalities の指定が必須
-        responseModalities: ['IMAGE'],
+        // TEXT+IMAGE 両方を指定することでプロンプトが正しく解釈される
+        responseModalities: ['TEXT', 'IMAGE'],
+        imageConfig: {
+          aspectRatio: '4:3',
+          imageSize: '1K',
+        },
       },
     });
 
