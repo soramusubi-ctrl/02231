@@ -19,7 +19,7 @@ if (!API_KEY) {
 const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 const RECIPE_MODEL = 'gemini-2.5-flash';
-const IMAGE_MODEL = 'gemini-2.5-flash-preview-04-17';
+const IMAGE_MODEL = 'gemini-3.1-flash-image-preview';
 
 // -------------------------------------------------------
 // レシピテキスト生成
