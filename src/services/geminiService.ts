@@ -179,15 +179,21 @@ export const generateRecipeImage = async (recipe: Recipe): Promise<string> => {
     const response: GenerateContentResponse = await ai.models.generateContent({
       model: IMAGE_MODEL,
       contents: prompt,
-      config: {},
+      config: {
+        // gemini-3.1-flash-image-preview は responseModalities の指定が必須
+        responseModalities: ['IMAGE'],
+      },
     });
 
-    const parts = response.candidates?.[0]?.content?.parts;
-    if (!parts) throw new Error('画像の生成に失敗しました。');
+    // response.parts を直接参照（thought パートはスキップ）
+    const parts = response.parts;
+    if (!parts || parts.length === 0) throw new Error('画像の生成に失敗しました。');
 
     for (const part of parts) {
+      // thought パート（思考過程の中間画像）はスキップ
+      if ((part as { thought?: boolean }).thought) continue;
       if (part.inlineData?.data) {
-        return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+        return `data:${part.inlineData.mimeType ?? 'image/png'};base64,${part.inlineData.data}`;
       }
     }
 
