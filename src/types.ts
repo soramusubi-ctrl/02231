@@ -1,10 +1,9 @@
-
 export enum ProteinType {
-  NONE = '野菜のみ (Vegetables Only)',
-  MEAT = '＋肉 (Add Meat)',
-  FISH = '＋魚 (Add Fish)',
-  EGG = '＋卵 (Add Egg)',
-  OTHER = '＋その他 (Other)',
+  NONE = '野菜のみ',
+  MEAT = '＋肉',
+  FISH = '＋魚',
+  EGG = '＋卵',
+  OTHER = '＋その他',
 }
 
 export enum CookingTime {
@@ -24,7 +23,7 @@ export enum RecipeMood {
   KIDS = '子供向け',
   TSUMAMI = 'おつまみ',
   SIMPLE = '素材本来の味',
-  FARMER = '農家直伝/珍しい野菜',
+  FARMER = '農家直伝',
 }
 
 export enum GenerationMode {
@@ -39,10 +38,10 @@ export interface Recipe {
   title: string;
   ingredients: string[];
   instructions: string[];
-  visualDescription: string; // Used for image generation prompt
-  imageBase64?: string; // Generated later
+  visualDescription: string;
+  imageBase64?: string;
   createdAt?: string;
-  reuseTip?: string; // Advice on ingredient reuse or meal planning
+  reuseTip?: string;
 }
 
 export interface Vegetable {
@@ -51,8 +50,10 @@ export interface Vegetable {
 }
 
 export interface RecipeState {
-  recipes: Recipe[]; // Changed from 'data: Recipe | null' to support multiple recipes
+  recipes: Recipe[];
   loading: boolean;
   imageLoading: boolean;
   error: string | null;
 }
+
+export type AppView = 'home' | 'favorites' | 'shoppingList';
