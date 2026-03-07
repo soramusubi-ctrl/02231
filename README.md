@@ -24,7 +24,9 @@
 - **React 19** + **TypeScript**
 - **Vite 6** (バンドラー)
 - **TailwindCSS 3** (スタイリング)
-- **Google Gemini API** (`gemini-2.5-flash` / `gemini-2.5-flash-preview-04-17`)
+- **Google Gemini API**
+  - レシピ・野菜認識: `gemini-3-flash-preview`
+  - 料理画像生成: `gemini-3.1-flash-image-preview`（Nano Banana 2）
 
 ---
 
