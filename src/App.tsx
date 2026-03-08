@@ -81,6 +81,9 @@ export default function App() {
     error: null,
   });
 
+  // --- 農家直伝レシピが0件だったか ---
+  const [farmerNoMatch, setFarmerNoMatch] = useState(false);
+
   // --- 保存済みレシピ・買い物リスト ---
   const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
   const [shoppingList, setShoppingList] = useState<string[]>([]);
@@ -199,6 +202,7 @@ export default function App() {
       .filter((v) => selectedIds.includes(v.id))
       .map((v) => v.name);
 
+    setFarmerNoMatch(false);
     setRecipeState({ recipes: [], loading: true, imageLoading: false, error: null });
 
     try {
@@ -207,15 +211,12 @@ export default function App() {
         const matched = findMatchingFarmerRecipes(selectedVegNames, finalProtein);
 
         if (matched.length === 0) {
-          setRecipeState({
-            recipes: [],
-            loading: false,
-            imageLoading: false,
-            error: '選択した野菜に合う農家直伝レシピが見つかりませんでした。野菜の選択を変えてみてください。',
-          });
+          setRecipeState({ recipes: [], loading: false, imageLoading: false, error: null });
+          setFarmerNoMatch(true);
           return;
         }
 
+        setFarmerNoMatch(false);
         const converted = matched.map(farmerRecipeToRecipe);
         setRecipeState({
           recipes: converted,
@@ -583,6 +584,22 @@ export default function App() {
             {recipeState.error && (
               <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-2xl mb-5 text-center text-sm print:hidden">
                 {recipeState.error}
+              </div>
+            )}
+
+            {/* 農家直伝レシピ 0件時メッセージ */}
+            {farmerNoMatch && (
+              <div className="animate-fade-in-up bg-green-50 border border-green-100 rounded-3xl p-6 mb-5 print:hidden">
+                <div className="flex flex-col items-center text-center gap-3">
+                  <span className="text-4xl">🌿</span>
+                  <p className="text-green-900 font-bold text-base">
+                    このお野菜の農家直伝レシピは、ただいま準備中です！
+                  </p>
+                  <p className="text-green-700 text-sm leading-relaxed">
+                    ご希望のレシピは公式LINEからお気軽にご質問ください。
+                    農家スタッフがお答えします。
+                  </p>
+                </div>
               </div>
             )}
 
