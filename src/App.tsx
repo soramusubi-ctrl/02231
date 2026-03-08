@@ -15,6 +15,7 @@ import {
   AppView,
 } from './types';
 import { generateRecipeText, generateRecipeImage } from './services/geminiService';
+import { findMatchingFarmerRecipes, farmerRecipeToRecipe } from './data/farmerRecipes';
 
 // -------------------------------------------------------
 // LocalStorage キー
@@ -201,7 +202,31 @@ export default function App() {
     setRecipeState({ recipes: [], loading: true, imageLoading: false, error: null });
 
     try {
-      // 1. テキスト生成
+      // 農家直伝モードの場合は固定データから返す（AI生成しない）
+      if (recipeMood === RecipeMood.FARMER) {
+        const matched = findMatchingFarmerRecipes(selectedVegNames, finalProtein);
+
+        if (matched.length === 0) {
+          setRecipeState({
+            recipes: [],
+            loading: false,
+            imageLoading: false,
+            error: '選択した野菜に合う農家直伝レシピが見つかりませんでした。野菜の選択を変えてみてください。',
+          });
+          return;
+        }
+
+        const converted = matched.map(farmerRecipeToRecipe);
+        setRecipeState({
+          recipes: converted,
+          loading: false,
+          imageLoading: false,
+          error: null,
+        });
+        return;
+      }
+
+      // 1. テキスト生成（通常のAI生成）
       const recipesData = await generateRecipeText(
         selectedVegNames,
         finalProtein,
