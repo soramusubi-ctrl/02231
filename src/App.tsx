@@ -603,6 +603,34 @@ export default function App() {
               </div>
             )}
 
+            {/* このアプリについて */}
+            <details className="print:hidden mt-2 mb-4">
+              <summary className="cursor-pointer text-xs text-stone-400 hover:text-stone-600 select-none flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM9 9a.75.75 0 0 0 0 1.5h.253a.25.25 0 0 1 .244.304l-.459 2.066A1.75 1.75 0 0 0 10.747 15H11a.75.75 0 0 0 0-1.5h-.253a.25.25 0 0 1-.244-.304l.459-2.066A1.75 1.75 0 0 0 9.253 9H9Z" clipRule="evenodd" />
+                </svg>
+                このアプリについて
+              </summary>
+              <div className="mt-3 bg-stone-50 border border-stone-100 rounded-2xl p-4 space-y-3 text-xs text-stone-500 leading-relaxed">
+                <div>
+                  <p className="font-bold text-stone-600 mb-1">📱 データの保存について</p>
+                  <p>野菜リスト・お気に入りレシピ・買い物リストは、<strong>あなたの端末内（ブラウザのlocalStorage）にのみ保存</strong>されます。外部サーバーへの保存は行っていません。ブラウザのデータを削除すると消えます。</p>
+                </div>
+                <div>
+                  <p className="font-bold text-stone-600 mb-1">🤖 AIへの送信について</p>
+                  <p>「レシピを生成する」ボタンを押すと、<strong>選択した野菜・食材・調理条件・NG食材</strong>がGoogleのAI（Gemini）に送信されます。氏名・住所などの個人情報は送信されません。</p>
+                </div>
+                <div>
+                  <p className="font-bold text-stone-600 mb-1">⚠️ 個人情報を入れないでください</p>
+                  <p>NG食材欄などに、お名前や連絡先などの個人情報を入力しないようお願いします。</p>
+                </div>
+                <div>
+                  <p className="font-bold text-stone-600 mb-1">📋 免責事項</p>
+                  <p>レシピはAIが自動生成したものです。アレルギーや体調に関わる判断は、必ずご自身でご確認ください。本アプリの利用によって生じたいかなる損害についても、責任を負いかねます。</p>
+                </div>
+              </div>
+            </details>
+
             {/* レシピ結果 */}
             {recipeState.recipes.length > 0 && (
               <div className="mb-12 print:mb-0 space-y-6">
