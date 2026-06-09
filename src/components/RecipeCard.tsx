@@ -55,7 +55,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
                 </span>
               </>
             ) : (
-              <span className="text-sm">画像生成エラー</span>
+              <span className="text-sm font-medium">画像生成エラー</span>
             )}
           </div>
         )}

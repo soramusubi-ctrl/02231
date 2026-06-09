@@ -249,7 +249,7 @@ export default function App() {
         recipesData.map(async (recipe) => {
           try {
             const base64Image = await generateRecipeImage(recipe);
-            return { ...recipe, imageBase64: base64Image };
+            return base64Image ? { ...recipe, imageBase64: base64Image } : recipe;
           } catch (e) {
             console.error(`Image gen failed for ${recipe.title}`, e);
             return recipe;

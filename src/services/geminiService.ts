@@ -47,10 +47,10 @@ export const generateRecipeText = async (
 export const generateRecipeImage = async (recipe: Recipe): Promise<string> => {
   try {
     const data = await postJson<{ imageBase64: string }>('/api/generate-recipe-image', { recipe });
-    return data.imageBase64;
+    return data.imageBase64 || '';
   } catch (error) {
     console.error('Image generation error:', error);
-    return `https://picsum.photos/seed/${encodeURIComponent(recipe.title)}/800/600?blur=1`;
+    return '';
   }
 };
 
