@@ -8,6 +8,23 @@ type Recipe = {
   visualDescription?: string;
 };
 
+type ImagePart = {
+  thought?: boolean;
+  inlineData?: {
+    data?: string;
+    mimeType?: string;
+  };
+};
+
+type ImageResponse = {
+  parts?: ImagePart[];
+  candidates?: Array<{
+    content?: {
+      parts?: ImagePart[];
+    };
+  }>;
+};
+
 const IMAGE_MODEL = 'gemini-3.1-flash-image-preview';
 
 async function readJsonBody(req: JsonRequest): Promise<unknown> {
@@ -30,6 +47,15 @@ function sendJson(res: ServerResponse, statusCode: number, body: unknown) {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Cache-Control', 'no-store');
   res.end(JSON.stringify(body));
+}
+
+function findImagePart(response: ImageResponse): ImagePart | undefined {
+  const parts = [
+    ...(response.parts || []),
+    ...(response.candidates?.flatMap((candidate) => candidate.content?.parts || []) || []),
+  ];
+
+  return parts.find((part) => !part.thought && Boolean(part.inlineData?.data));
 }
 
 export default async function handler(req: JsonRequest, res: ServerResponse) {
@@ -56,17 +82,16 @@ export default async function handler(req: JsonRequest, res: ServerResponse) {
     }
 
     const prompt = [
-      'Generate a single professional food photograph of the following Japanese home-cooked dish:',
-      `Dish name: "${title}"`,
-      `Visual description: ${visualDescription || 'fresh home-cooked Japanese dish, plated and ready to eat'}`,
+      'Create one realistic food photograph of this exact home-cooked dish.',
+      `Dish name: ${title}`,
+      `Dish description: ${visualDescription || 'fresh Japanese home-cooked dish, plated and ready to eat'}`,
       '',
-      'Requirements:',
-      '- The image must show the specific dish described above, plated and ready to eat.',
-      '- Do not generate landscapes, scenery, people, packaging, menus, or unrelated images.',
-      '- Style: overhead or 45-degree angle food photography, soft natural lighting, shallow depth of field.',
-      '- Background: clean wooden table or neutral linen cloth.',
-      '- The food should look appetizing, fresh, and home-cooked.',
-      '- Aspect ratio: 4:3, resolution: 1K.',
+      'Important rules:',
+      '- Show only the finished food dish on a plate or bowl.',
+      '- Do not show forests, landscapes, farms, fields, people, packages, menus, text, logos, or unrelated scenes.',
+      '- The image must match the dish name and ingredients.',
+      '- Style: simple home cooking, natural light, appetizing, clean table.',
+      '- Camera: overhead or 45-degree food photography.',
     ].join('\n');
 
     const ai = new GoogleGenAI({ apiKey });
@@ -80,19 +105,22 @@ export default async function handler(req: JsonRequest, res: ServerResponse) {
           imageSize: '1K',
         },
       },
-    });
+    }) as ImageResponse;
 
-    for (const part of response.parts || []) {
-      if ((part as { thought?: boolean }).thought) continue;
-      if (part.inlineData?.data) {
-        sendJson(res, 200, {
-          imageBase64: `data:${part.inlineData.mimeType ?? 'image/png'};base64,${part.inlineData.data}`,
-        });
-        return;
-      }
+    const imagePart = findImagePart(response);
+    if (imagePart?.inlineData?.data) {
+      sendJson(res, 200, {
+        imageBase64: `data:${imagePart.inlineData.mimeType ?? 'image/png'};base64,${imagePart.inlineData.data}`,
+      });
+      return;
     }
 
-    sendJson(res, 502, { error: '画像の生成に失敗しました。' });
+    console.error('generate-recipe-image no image part', JSON.stringify({
+      hasParts: Boolean(response.parts?.length),
+      candidateCount: response.candidates?.length || 0,
+      candidateParts: response.candidates?.map((candidate) => candidate.content?.parts?.length || 0) || [],
+    }));
+    sendJson(res, 502, { error: '画像データが返りませんでした。' });
   } catch (error) {
     console.error('generate-recipe-image error:', error instanceof Error ? error.message : String(error));
     sendJson(res, 500, { error: '画像生成に失敗しました。時間を置いて再度お試しください。' });
